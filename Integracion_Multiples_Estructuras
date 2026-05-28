@@ -1,19 +1,21 @@
 
 """
-streamMX_sistema_s14.py
-Semana 14 - Taller Integrador: StreamMX Premium
-Equipo: [3]
-Integrantes: [Oscar Javier Carrillo Isiordia]
+Semana 14 - Taller Integrador: StreamMX
+Equipo: 3
+Integrantes: Oscar Javier Carrillo Isiordia y Daira Mabel Cerda Lomeli
 
-# COMPRENDE-1: INVENTARIO DE ESTRUCTURAS DEL PROYECTO
-| Estructura          | ¿Qué almacena?            | Operación que resuelve         | Complejidad | Sem. Origen 
----------------------|---------------------------|--------------------------------|-------------|-------------
- 1. Diccionario      | Películas por ID único    | Búsqueda exacta e inmediata    | O(1)        | Semana 12   
- 2. Árbol (BST)      | Películas por Puntaje     | Consultas por rango y filtros  | O(log n + k)| Semana 13   
- 3. Lista (Pila)     | IDs de lo último agregado | Historial de inserciones       | O(1)        | Semana 5    
 
-## COMPRENDE-2: MATRIZ DE ACOPLAMIENTO (Operaciones Compuestas)#
 
+COMPRENDE-1: INVENTARIO DE ESTRUCTURAS DEL PROYECTO
+| Estructura          | ¿Qué almacena?            | Operación que resuelve         | Complejidad  | Sem. Origen |
+|---------------------|---------------------------|--------------------------------|------------- |-------------|
+| 1. Diccionario      | Películas por ID único    | Búsqueda exacta e inmediata    | O(1)         | Semana 12   |
+| 2. Árbol (BST)      | Películas por Puntaje     | Consultas por rango y filtros  | O(log n + k) | Semana 13   |
+| 3. Lista (Pila)     | IDs de lo último agregado | Historial de inserciones       | O(1)         | Semana 5    |
+
+
+
+COMPRENDE-2: MATRIZ DE ACOPLAMIENTO (Operaciones Compuestas)
 Operación Compuesta 1: "Buscar historial y extraer detalles"
   - Paso 1: Sacar los últimos 5 IDs del historial -> O(k) [Estructura: Lista]
   - Paso 2: Buscar esos 5 IDs en el diccionario -> O(k * 1) [Estructura: Dict]
@@ -24,26 +26,27 @@ Operación Compuesta 2: "Rango de puntajes y top" (Recomendar)
   - Paso 2: Ordenar los 'k' resultados de mayor a menor -> O(k log k) [Estructura: Arreglo]
   - Complejidad Total: O(log n + k log k)
 
-# IA-REFLEXION-C: 
-# [IA]: "Si la inserción falla a la mitad (se guarda en el dict pero el árbol da error), el sistema queda inconsistente."
-# [Equipo]: Muy útil. Por eso nuestro método `agregar_contenido` primero valida todo antes de insertar, asegurando que o se guarda en las 3 estructuras o en ninguna (Todo o Nada).
+IA-REFLEXION-C: 
+[IA]: "Si la inserción falla a la mitad (se guarda en el dict pero el árbol da error), el sistema queda inconsistente."
+[Equipo]: Muy útil. Por eso nuestro método `agregar_contenido` primero valida todo antes de insertar, asegurando que o se guarda en las 3 estructuras o en ninguna (Todo o Nada).
 
 
-## COEVALUACION:#
 
-# Revisamos a: [Nombre de otro equipo]
-# Fortalezas: Buenas validaciones y nombres de variables muy claros.
-# Mejoras: Faltó comentar el factor teórico de Big-O y el árbol no manejaba empates de puntaje.
-# Cambios nuestros: Nos dimos cuenta de que nuestro historial no tenía un límite máximo, se lo agregamos.
+COEVALUACION:
+Revisamos a: [Nombre de otro equipo]
+Fortalezas: Buenas validaciones y nombres de variables muy claros.
+Mejoras: Faltó comentar el factor teórico de Big-O y el árbol no manejaba empates de puntaje.
+Cambios nuestros: Nos dimos cuenta de que nuestro historial no tenía un límite máximo, se lo agregamos.
 """
+
 
 import time
 import random
 import statistics
 
-# ===============================================================================
+
 # 1. ESTRUCTURAS BÁSICAS
-# ===============================================================================
+
 class NodoBST:
     def __init__(self, clave, valor):
         self.clave = clave  # Puntaje de la película
@@ -53,9 +56,10 @@ class NodoBST:
         self.izq = None
         self.der = None
 
-# ===============================================================================
+
+
 # 2. SISTEMA CENTRAL (A-3, A-4, A-5)
-# ===============================================================================
+
 class SistemaMX:
     def __init__(self):
         # APLICA-3: Inicializamos nuestras 3 estructuras vacías.
@@ -145,9 +149,11 @@ class SistemaMX:
         if nodo.clave < maxv:
             self._bst_rango(nodo.der, minv, maxv, resultado)
 
-# ===============================================================================
+
+
+
 # 3. PRUEBAS DE INTEGRIDAD Y CASOS EXTREMOS (V-8 Y V-9)
-# ===============================================================================
+
 def contar_nodos_bst(nodo):
     """ Cuenta cuántas películas hay realmente en el árbol. """
     if nodo is None: return 0
@@ -198,9 +204,11 @@ def caso_v5_equipo_historial_exagerado(s):
     assert len(r) == len(s.historial)
     print("✅ V-5: Si piden más historial del que existe, Python lo recorta solo sin fallar.")
 
-# ===============================================================================
+
+
+
 # 4. BENCHMARK (REFLEXIONA 1 Y 2) Y VEREDICTO FINAL (P-10)
-# ===============================================================================
+
 def medir_p95(fn, repeticiones=200, warmup=20):
     for _ in range(warmup): fn()
     muestras = []
@@ -226,8 +234,10 @@ def benchmark_sistema(n):
     
     return {'lookup': (med_look, p95_look), 'rango': (med_rang, p95_rang), 'top_n': (med_top, p95_top)}
 
+
+
 """
-# REFLEXIONA-1 Y REFLEXIONA-2:
+REFLEXIONA-1 Y REFLEXIONA-2:
 | Operación | n=10,000 Mediana | n=10,000 P95 | Complejidad  |
 |-----------|------------------|--------------|--------------|
 | lookup    | 0.001 ms         | 0.002 ms     | O(1) amort.  |
@@ -237,19 +247,20 @@ def benchmark_sistema(n):
 Cuello de botella: top_n. Toma casi 5 milisegundos ordenar 10,000 elementos. 
 Si el catálogo crece a 1 millón, el sistema va a colapsar al pedir el top 10.
 
-# DECISIONES ARQUITECTÓNICAS (P-10):
+
+DECISIONES ARQUITECTÓNICAS (P-10):
 1. DICT para búsquedas por ID: Elegido porque su complejidad es O(1) (constante). Es inigualable cuando ya sabemos qué película queremos ver.
+
 2. ÁRBOL BST para rangos: Elegido porque descarta ramas. Si usáramos el diccionario para buscar películas de 8 a 9, tendríamos que revisar las 10,000 una por una O(n). El árbol baja eso a microsegundos O(log n).
+
 3. LISTA para historial: Elegido porque hacer un `.append()` a una lista nativa en Python cuesta O(1).
 """
 
-# ===============================================================================
+
 # BLOQUE MAESTRO - EL QUE CORRES EN LA DEMO
-# ===============================================================================
+
 if __name__ == "__main__":
-    print("\n" + "═"*70)
-    print(" 🎬 DEMO FINAL HITO 3 - STREAMMX PREMIUM ".center(70))
-    print("═"*70)
+    print(" 🎬 DEMO FINAL HITO 3 - STREAMMX ")
     
     s = SistemaMX()
     
@@ -295,11 +306,10 @@ if __name__ == "__main__":
     caso_v4_equipo_empates_exactos(s)
     caso_v5_equipo_historial_exagerado(s)
 
-    # 5. Benchmark (Opcional mostrar en demo, pero bueno tenerlo)
+    # 5. Benchmark
     print("\n[5] Benchmark Rápido (1000 elementos):")
     r = benchmark_sistema(1000)
     print(f"  Lookup: {r['lookup'][0]:.4f} ms")
     print(f"  Rango:  {r['rango'][0]:.4f} ms")
     print(f"  Top N:  {r['top_n'][0]:.4f} ms")
     print("\n¡DEMO EXITOSA! LISTOS PARA LA DEFENSA. 🚀")
-
